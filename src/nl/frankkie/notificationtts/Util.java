@@ -7,7 +7,6 @@ import static android.content.Context.ACTIVITY_SERVICE;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.service.notification.StatusBarNotification;
 import android.speech.tts.TextToSpeech;
