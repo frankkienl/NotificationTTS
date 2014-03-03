@@ -26,35 +26,44 @@ public class Util {
 
     public static TextToSpeech textToSpeech = null;
 
+    /**
+     * Speak some text
+     *
+     * @param c the Context (does not have to be an Activity)
+     * @param txt the Text to speak
+     */
     public static void tts(final Context c, final String txt) {
-        //check cooldown
 
+        //check cooldown (Dont say the same thing over and over again)
         if (!checkCooldown(c, txt)) {
-            return; //cooldown not over.
+            return; //cooldown not over. Dont Speak.
         }
 
         if (textToSpeech == null) {
+            //Make TTS
             textToSpeech = new TextToSpeech(c, new TextToSpeech.OnInitListener() {
 
                 public void onInit(int arg0) {
                     if (arg0 == TextToSpeech.SUCCESS) {
+                        //When init is done, proceed to talk.
                         ttsOnInit(c, txt);
                     }
                 }
             });
             //http://developer.android.com/reference/android/speech/tts/TextToSpeech.html
+            //The TTS system has changed since Android 4.0.3 (15)
             if (android.os.Build.VERSION.SDK_INT > 15) {
                 textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
 
                     @Override
                     public void onStart(String arg0) {
-                        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        //do nothing
                     }
 
                     @Override
                     public void onDone(String arg0) {
-                        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                         try {
+                            //Stop TTS engine when speaking is over.
                             textToSpeech.shutdown();
                             textToSpeech = null;
                         } catch (Exception e) {
@@ -63,8 +72,8 @@ public class Util {
 
                     @Override
                     public void onError(String arg0) {
-                        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                         try {
+                            //Stop TTS engine on error
                             textToSpeech.shutdown();
                             textToSpeech = null;
                         } catch (Exception e) {
@@ -72,6 +81,7 @@ public class Util {
                     }
                 });
             } else {
+                //Older Android version than 4.0.3 (but still Android 1.6+)
                 textToSpeech.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
 
                     public void onUtteranceCompleted(String utteranceId) {
@@ -84,31 +94,56 @@ public class Util {
                 });
             }
         } else {
-            //Niet null, dus is al gemaakt.
+            //Not null, proceed to speaking.
             ttsOnInit(c, txt);
         }
     }
 
-    public static void ttsOnInit(Context c, String txt) {
+    /**
+     * This gets called when the TTS-engine is ready to use. Dont call this
+     * directly, use tts(Context, String) instead.
+     *
+     * @param c the Context
+     * @param txt the Text to speak
+     */
+    private static void ttsOnInit(Context c, String txt) {
         if (textToSpeech != null) {
+            //If TTS engine is ready, speak
             textToSpeech.speak(txt, TextToSpeech.QUEUE_ADD, null);
         } else {
+            //Not ready to speak, init it.
             tts(c, txt); //I hope this wont StackOverFlow!!
         }
     }
 
+    /**
+     * Process the Notification, coming from the NotificationListener (Android 4.3+)
+     * @param c Context
+     * @param notification notification
+     */
     public static void processNotification(Context c, StatusBarNotification notification) {
         String packagename = notification.getPackageName().toString();
         String appName = getAppNameByPackagename(c, packagename);
         tts(c, appName);
     }
 
+    /**
+     * Process the Notification, coming from the AccessibilityStuff (Lower than Android 4.3)
+     * @param c Context
+     * @param notification notification
+     */
     public static void processNotification(Context c, AccessibilityEvent notification) {
         String packagename = notification.getPackageName().toString();
         String appName = getAppNameByPackagename(c, packagename);
         tts(c, appName);
     }
 
+    /**
+     * Check if a certain string has been said in the last 15 seconds.
+     * @param c Context (does not have to be an Activity, used for SharedPreferences)
+     * @param s String to check
+     * @return True when cooldown is over, false otherwise (false=stfu)
+     */
     public static boolean checkCooldown(Context c, String s) {
         long cooldown = 1000 * 15; //10 sec        
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
