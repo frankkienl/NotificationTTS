@@ -19,7 +19,7 @@ public class MyAccessibilityService extends AccessibilityService {
         
         //http://stackoverflow.com/questions/13853304/accessibility-events-not-recognized-by-accessibility-service-in-android-2-3gb
         AccessibilityServiceInfo info = new AccessibilityServiceInfo();
-        info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
+        info.eventTypes = AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED;
         info.feedbackType = AccessibilityServiceInfo.FEEDBACK_SPOKEN;
         info.notificationTimeout = 0;
         info.flags = AccessibilityServiceInfo.DEFAULT;

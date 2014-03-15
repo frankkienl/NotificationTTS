@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+TODO:
+. see the difference between Toast-messages and Notifications
+. see if notifications vibrate, use led or make a sound
+. Make a history
+. Make filters with
+. . Packagename
+. . Appname
+. . Text ( equals ; !equals ; contains ; !contains ; regex ; startsWith ; endsWith ) 
+. . Time based
+. Make actions
+. . Read Appname (default)
+. . Read specific text (String)
+. . Play specific sound 
+. . Read Packagename
+. . Read (full) Message
+. Make default filters
+. . Google Now / Google Search
+. . WhatsApp (name)
+. . System-UI (message, gps?)
+. . Android System (usb)
+. . AndChat "IRC"
+//-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="nl.frankkie.notificationtts"
           android:versionCode="1"

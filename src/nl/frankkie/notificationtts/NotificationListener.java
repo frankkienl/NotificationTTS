@@ -21,10 +21,13 @@ public class NotificationListener extends NotificationListenerService {
 
     @Override
     public void onDestroy() {
-        if (Util.textToSpeech != null) {
-            //Kill
-            Util.textToSpeech.shutdown();
-            Util.textToSpeech = null;
+        try {
+            if (Util.textToSpeech != null) {
+                //Kill
+                Util.textToSpeech.shutdown();
+                Util.textToSpeech = null;
+            }
+        } catch (Exception e) {
         }
     }
 

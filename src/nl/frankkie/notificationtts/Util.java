@@ -16,6 +16,7 @@ import android.widget.RemoteViews;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import nl.frankkie.notificationtts.db.UserRule;
 
 /**
  *
@@ -24,6 +25,25 @@ import java.util.ArrayList;
 public class Util {
 
     public static TextToSpeech textToSpeech = null;
+    public static ArrayList<UserRule> rules = new ArrayList<UserRule>();
+
+    /**
+     * Filtering a stuff happens here !!
+     *
+     * @param c
+     * @param notification
+     * @param packagename
+     */
+    public static void process(Context c, Notification notification, String packagename) {
+        String appName = getAppNameByPackagename(c, packagename);
+        
+        //check filters
+        if (packagename.equals("com.whatsapp")){
+            
+        }
+        
+        tts(c, appName);
+    }
 
     /**
      * Speak some text
@@ -116,30 +136,36 @@ public class Util {
     }
 
     /**
-     * Process the Notification, coming from the NotificationListener (Android 4.3+)
+     * Process the Notification, coming from the NotificationListener (Android
+     * 4.3+)
+     *
      * @param c Context
      * @param notification notification
      */
     public static void processNotification(Context c, StatusBarNotification notification) {
+        Notification notification1 = notification.getNotification(); //<-- !       
         String packagename = notification.getPackageName().toString();
-        String appName = getAppNameByPackagename(c, packagename);
-        tts(c, appName);
+        process(c, notification1, packagename);
     }
 
     /**
-     * Process the Notification, coming from the AccessibilityStuff (Lower than Android 4.3)
+     * Process the Notification, coming from the AccessibilityStuff (Lower than
+     * Android 4.3)
+     *
      * @param c Context
      * @param notification notification
      */
     public static void processNotification(Context c, AccessibilityEvent notification) {
+        Notification notification1 = (Notification) notification.getParcelableData();  //<-- !      
         String packagename = notification.getPackageName().toString();
-        String appName = getAppNameByPackagename(c, packagename);
-        tts(c, appName);
+        process(c, notification1, packagename);
     }
 
     /**
      * Check if a certain string has been said in the last 15 seconds.
-     * @param c Context (does not have to be an Activity, used for SharedPreferences)
+     *
+     * @param c Context (does not have to be an Activity, used for
+     * SharedPreferences)
      * @param s String to check
      * @return True when cooldown is over, false otherwise (false=stfu)
      */

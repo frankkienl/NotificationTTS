@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 /**
  *
- * @author Gebruiker
+ * @author FrankkieNL
  */
 public class AccessibilityServiceSettingsActivity extends Activity {
 
