@@ -28,8 +28,6 @@ public class MainActivity extends Activity {
                 } else {
                     intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
                 }
-                startActivity(intent);
-
                 try {
                     startActivity(intent);
                     Toast.makeText(MainActivity.this, "Please enable the Notification TTS Service.", Toast.LENGTH_LONG).show();

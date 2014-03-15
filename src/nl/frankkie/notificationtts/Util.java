@@ -36,12 +36,40 @@ public class Util {
      */
     public static void process(Context c, Notification notification, String packagename) {
         String appName = getAppNameByPackagename(c, packagename);
-        
+        String notificationText = getNotificationText(notification);
+
         //check filters
-        if (packagename.equals("com.whatsapp")){
-            
+        if (packagename.equals("com.whatsapp")) { //WhatsApp
+            //Example Messages:
+            //Some Name\nSome Message
+            //Some Name\n2 new messages.\n
+            //WhatsApp\n6 messages from 3 conversations.\n
+            String who = notificationText.substring(0, notificationText.indexOf("\n"));
+            String message = notificationText.substring(notificationText.indexOf("\n") + 1, notificationText.length());
+            String tickerText = notification.tickerText.toString();
+            if (message.endsWith("new messages.\n")) {
+                //multiple messages from 1 person
+                tts(c, "WhatsApp " + who + " " + message.substring(0, message.indexOf("new")) + " messages");
+            } else if (who.equals("WhatsApp") && message.endsWith("conversations.\n")) {
+                //multiple messages from multiple persons
+                boolean readNumbers = false;
+                if (readNumbers) {
+                    tts(c, "WhatsApp " + message);
+                } else {
+                    tts(c, "WhatsApp " + tickerText);
+                }
+            } else {
+                //1 message from 1 person
+                tts(c, "WhatsApp " + who);
+            }
+            return; //done here
         }
-        
+
+        //check cooldown 
+        //(Dont say the same thing over and over again)
+        if (!checkCooldown(c, appName)) {
+            return; //cooldown not over. Dont Speak.
+        }
         tts(c, appName);
     }
 
@@ -52,11 +80,6 @@ public class Util {
      * @param txt the Text to speak
      */
     public static void tts(final Context c, final String txt) {
-
-        //check cooldown (Dont say the same thing over and over again)
-        if (!checkCooldown(c, txt)) {
-            return; //cooldown not over. Dont Speak.
-        }
 
         if (textToSpeech == null) {
             //Make TTS
@@ -186,43 +209,11 @@ public class Util {
         return ans;
     }
 
-//    public static void processNotification(Context c, StatusBarNotification notification) {
-//        String packagename = notification.getPackageName().toString();
-//        if (packagename.equalsIgnoreCase("com.android.vending")) {
-//            String s = notification.getNotification().tickerText.toString();
-//            Log.e("AntiAutoUpdate", s);
-//            String currently = getAppNameByPackagename(c, getForegroundAppPackagename(c));
-//            if (s.contains(currently)) {
-//                //Google Play is trying to update the app in the foreground.
-//                //KILL IT WITH FIRE.
-//                Toast.makeText(c, "Killing Google Play, for updating " + s, Toast.LENGTH_LONG).show();
-//                kill(c, "com.android.vending");
-//                killThisApp(c, "com.android.vending"); //just to be sure, kill it twice
-//            }
-//        }
-//
-//    }
-//
-//    public static void processNotification(Context c, AccessibilityEvent notification) {        
-//        String packagename = notification.getPackageName().toString();
-//        if (packagename.equalsIgnoreCase("com.android.vending")) {
-//            String s = getNotificationText(notification);
-//            Log.e("AntiAutoUpdate", s);
-//            String currently = getAppNameByPackagename(c, getForegroundAppPackagename(c));
-//            if (s.contains(currently)) {
-//                //Google Play is trying to update the app in the foreground.
-//                //KILL IT WITH FIRE.
-//                Toast.makeText(c, "Killing Google Play, for updating " + s, Toast.LENGTH_LONG).show();
-//                kill(c, "com.android.vending");
-//                killThisApp(c, "com.android.vending"); //just to be sure, kill it twice
-//            }
-//        }
-//    }
-    public static String getNotificationText(AccessibilityEvent event) {
+    public static String getNotificationText(Notification notification) {
         //http://stackoverflow.com/questions/9292032/extract-notification-text-from-parcelable-contentview-or-contentintent
         String answer = "";
         try {
-            Notification notification = (Notification) event.getParcelableData();
+            //Notification notification = (Notification) event.getParcelableData();
             RemoteViews views = notification.contentView;
             Class secretClass = views.getClass();
 
